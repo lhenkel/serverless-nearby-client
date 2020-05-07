@@ -27,6 +27,7 @@ export default function Login() {
 
         try {
             await Auth.signIn(fields.email, fields.password);
+            console.log('was here');
             userHasAuthenticated(true);
             //history.push("/");
         } catch (e) {

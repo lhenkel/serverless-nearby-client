@@ -21,7 +21,6 @@ function App() {
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
-
   const [isAuthenticated, userHasAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
 
@@ -60,6 +59,18 @@ function App() {
           <NavbarToggler onClick={toggle} />
           <Collapse className=" " isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar >
+              {isAuthenticated ? (
+                <>
+                  <NavItem>
+                    <NavLink className="nav-link" to="/prospect" >Add Prospect</NavLink>
+                  </NavItem>
+
+                </>
+              ) : (
+                  <>
+                    <span></span>
+                  </>
+                )}
 
 
             </Nav>
@@ -69,17 +80,12 @@ function App() {
             {isAuthenticated ? (
               <>
                 <NavItem>
-                  <NavLink className="nav-link" onClick={handleLogout}>Logout</NavLink>
+                  <NavLink className="nav-link" to="#" onClick={handleLogout}>Logout</NavLink>
                 </NavItem>
 
               </>
             ) : (
                 <>
-                  <NavItem>
-
-                    <NavLink className="nav-link" to="/signup">Signup</NavLink>
-
-                  </NavItem>
                   <NavItem>
                     <NavLink className="nav-link" to="/login">Login</NavLink>
                   </NavItem>

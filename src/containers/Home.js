@@ -7,78 +7,112 @@ import { API } from "aws-amplify";
 import "./Home.css";
 import { Link } from "react-router-dom";
 
-
-export default function Home() {
-    const [notes, setNotes] = useState([]);
+export default function Home({ coords }) {
+    const [locations, setLocations] = useState([]);
     const { isAuthenticated } = useAppContext();
     const [isLoading, setIsLoading] = useState(true);
+    const [position, setPosition] = useState(null);
+
+    function loadLocations(position) {
+        return API.post("find-nearby", "/find", {
+            body: { "lat": position.latitude, "lng": position.longitude }
+        });
+    }
 
     useEffect(() => {
         async function onLoad() {
             if (!isAuthenticated) {
                 return;
             }
-
             try {
-                const notes = await loadNotes();
-                setNotes(notes);
+                if (position == null) {
+                    const settings = {
+                        enableHighAccuracy: false,
+                        timeout: Infinity,
+                        maximumAge: 0,
+                    };
+
+                    const onChange = ({ coords, timestamp }) => {
+                        setPosition({
+                            latitude: coords.latitude,
+                            longitude: coords.longitude,
+                            accuracy: coords.accuracy,
+                            timestamp,
+                        });
+                    };
+
+                    if (!navigator || !navigator.geolocation) {
+                        onError('Geolocation is not supported');
+                    }
+                    await navigator.geolocation.getCurrentPosition(onChange, onError, settings);
+                } else {
+                    console.log(position);
+                    const queryResults = await loadLocations(position);
+                    setLocations(queryResults);
+                }
+
+                if (locations) {
+                    renderLocationList(locations);
+                }
             } catch (e) {
                 onError(e);
             }
-
             setIsLoading(false);
         }
 
         onLoad();
-    }, [isAuthenticated]);
+    }, [isAuthenticated, position, locations]);
 
-    function loadNotes() {
-        return API.get("notes", "/notes");
-    }
-
-    function renderNotesList(notes) {
-        return [{}].concat(notes).map((note, i) =>
+    function renderLocationList(locations) {
+        //console.log(locations);
+        if (!locations) {
+            return;
+        }
+        if (locations.length == 0) {
+            return;
+        }
+        return [{}].concat(locations).map((curLocation, i) =>
             i !== 0 ? (
-                <LinkContainer key={note.noteId} to={`/notes/${note.noteId}`}>
-                    <ListGroupItem header={note.content.trim().split("\n")[0]}>
-                        {"Created: " + new Date(note.createdAt).toLocaleString()}
+                <LinkContainer key={curLocation.hashKey.N} to={`/notes/${curLocation.hashKey}`}>
+                    <ListGroupItem header={curLocation.name.S}>
+                        {curLocation.address.S}
                     </ListGroupItem>
                 </LinkContainer>
             ) : (
-                    <LinkContainer key="new" to="/notes/new">
-                        <ListGroupItem>
-                            <h4>
-                                <b>{"\uFF0B"}</b> Create a new note
-                </h4>
-                        </ListGroupItem>
-                    </LinkContainer>
+                    <span> </span>
                 )
         );
+
     }
 
     function renderLander() {
         return (
             <div className="lander">
-                <h1>Scratch</h1>
-                <p>A simple note taking app</p>
+                <h1>Cust-Dar</h1>
+                <p>This is a demo version of something I did at work.
+                Since I didn't want to expose real customer data, I loaded
+                a list of Starbucks and made some fake orders instead.
+                It will actually authenticate, but you can use
+                the fake credentials that will be auto-filled.
+                </p>
                 <div>
                     <Link to="/login" className="btn btn-info btn-lg">
                         Login
-              </Link>
-                    <Link to="/signup" className="btn btn-success btn-lg">
-                        Signup
               </Link>
                 </div>
             </div>
         );
     }
 
-    function renderNotes() {
+    function renderLocations() {
         return (
-            <div className="notes">
-                <PageHeader>Your Notes</PageHeader>
+            <div className="locations">
+                <PageHeader>Nearby Locations
+                    {(position == null) ? '' : ' [' + position.longitude.toString().slice(0, 8) + ', '}
+                    {(position == null) ? '' : position.latitude.toString().slice(0, 7) + ']'}
+                </PageHeader>
                 <ListGroup>
-                    {!isLoading && renderNotesList(notes)}
+                    {!isLoading && renderLocationList(locations)}
                 </ListGroup>
             </div>
         );
@@ -86,7 +120,7 @@ export default function Home() {
 
     return (
         <div className="Home">
-            {isAuthenticated ? renderNotes() : renderLander()}
+            {isAuthenticated ? renderLocations() : renderLander()}
         </div>
     );
 }
