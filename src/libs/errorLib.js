@@ -1,5 +1,5 @@
 
-const isLocal = process.env.NODE_ENV === "development";
+//const isLocal = process.env.NODE_ENV === "development";
 
 
 export function logError(error, errorInfo = null) {

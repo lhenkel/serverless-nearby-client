@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useHistory, NavLink } from "react-router-dom";
+import { useHistory, NavLink } from "react-router-dom";
 import {
   Collapse,
   Navbar,
@@ -12,7 +12,6 @@ import {
 
 import './App.css';
 import Routes from "./Routes";
-import { LinkContainer } from "react-router-bootstrap";
 import { AppContext } from "./libs/contextLib";
 import { Auth } from "aws-amplify";
 import ErrorBoundary from "./components/ErrorBoundary";

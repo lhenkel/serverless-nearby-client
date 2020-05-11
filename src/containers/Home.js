@@ -1,89 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { PageHeader, ListGroup, ListGroupItem } from "react-bootstrap";
+import React, { useEffect } from "react";
+
 import { useAppContext } from "../libs/contextLib";
-import { LinkContainer } from "react-router-bootstrap";
-import { onError } from "../libs/errorLib";
-import { API } from "aws-amplify";
+//import { onError } from "../libs/errorLib";
 import "./Home.css";
 import { Link } from "react-router-dom";
+//import LocationsList from "../containers/LocationsList";
+import LocationsList from "../components/LocationsList";
 
 export default function Home({ coords }) {
-    const [locations, setLocations] = useState([]);
+    //const [locations, setLocations] = useState([]);
     const { isAuthenticated } = useAppContext();
-    const [isLoading, setIsLoading] = useState(true);
-    const [position, setPosition] = useState(null);
-
-    function loadLocations(position) {
-        return API.post("find-nearby", "/find", {
-            body: { "lat": position.latitude, "lng": position.longitude }
-        });
-    }
+    //const [isLoading, setIsLoading] = useState(true);
+    //const [position, setPosition] = useState(null);
 
     useEffect(() => {
         async function onLoad() {
             if (!isAuthenticated) {
                 return;
             }
-            try {
-                if (position == null) {
-                    const settings = {
-                        enableHighAccuracy: false,
-                        timeout: Infinity,
-                        maximumAge: 0,
-                    };
 
-                    const onChange = ({ coords, timestamp }) => {
-                        setPosition({
-                            latitude: coords.latitude,
-                            longitude: coords.longitude,
-                            accuracy: coords.accuracy,
-                            timestamp,
-                        });
-                    };
-
-                    if (!navigator || !navigator.geolocation) {
-                        onError('Geolocation is not supported');
-                    }
-                    await navigator.geolocation.getCurrentPosition(onChange, onError, settings);
-                } else {
-                    console.log(position);
-                    const queryResults = await loadLocations(position);
-                    setLocations(queryResults);
-                }
-
-                if (locations) {
-                    renderLocationList(locations);
-                }
-            } catch (e) {
-                onError(e);
-            }
-            setIsLoading(false);
+            return (
+                <LocationsList />
+            );
+            //setIsLoading(false);
         }
 
         onLoad();
-    }, [isAuthenticated, position, locations]);
-
-    function renderLocationList(locations) {
-        //console.log(locations);
-        if (!locations) {
-            return;
-        }
-        if (locations.length == 0) {
-            return;
-        }
-        return [{}].concat(locations).map((curLocation, i) =>
-            i !== 0 ? (
-                <LinkContainer key={curLocation.hashKey.N} to={`/notes/${curLocation.hashKey}`}>
-                    <ListGroupItem header={curLocation.name.S}>
-                        {curLocation.address.S}
-                    </ListGroupItem>
-                </LinkContainer>
-            ) : (
-                    <span> </span>
-                )
-        );
-
-    }
+    }, [isAuthenticated]);
 
     function renderLander() {
         return (
@@ -98,29 +41,15 @@ export default function Home({ coords }) {
                 <div>
                     <Link to="/login" className="btn btn-info btn-lg">
                         Login
-              </Link>
+                    </Link>
                 </div>
-            </div>
-        );
-    }
-
-    function renderLocations() {
-        return (
-            <div className="locations">
-                <PageHeader>Nearby Locations
-                    {(position == null) ? '' : ' [' + position.longitude.toString().slice(0, 8) + ', '}
-                    {(position == null) ? '' : position.latitude.toString().slice(0, 7) + ']'}
-                </PageHeader>
-                <ListGroup>
-                    {!isLoading && renderLocationList(locations)}
-                </ListGroup>
             </div>
         );
     }
 
     return (
         <div className="Home">
-            {isAuthenticated ? renderLocations() : renderLander()}
+            {isAuthenticated ? <LocationsList /> : renderLander()}
         </div>
     );
 }
