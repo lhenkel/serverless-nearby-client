@@ -5,7 +5,7 @@ import { onError } from "../libs/errorLib";
 import { API } from "aws-amplify";
 import StoreCard from './StoreCard';
 import { usePosition } from '../libs/usePosition';
-
+import LoadingDisplay from "../components/LoadingDisplay";
 export default function LocationsList() {
 
     const [isLoadingPosition, setIsLoadingPosition] = useState(true);
@@ -61,11 +61,11 @@ export default function LocationsList() {
         } else {
             if (isLoadingLocations) {
                 return (
-                    <div>Loading Locations</div>
+                    <LoadingDisplay Icon='sync' MessageText='Loading Locations' />
                 );
             } else if (latitude == null) {
                 return (
-                    <div>Loading Position</div>
+                    <LoadingDisplay Icon='compass' MessageText='Loading Position' />
                 );
             } else {
                 return (

@@ -14,6 +14,7 @@ import { useFormFields } from "../libs/hooksLib";
 import { onError } from "../libs/errorLib";
 import "./Signup.css";
 
+
 export default function Prospect() {
     const [fields, handleFieldChange] = useFormFields({
         email: "",
