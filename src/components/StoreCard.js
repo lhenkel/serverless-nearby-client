@@ -5,6 +5,7 @@ import {
     CardTitle
 } from 'reactstrap';
 import { ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText } from 'reactstrap';
+import { API } from "aws-amplify";
 
 function OrderItem(props) {
     console.log(props.OrderInfo.Items);
@@ -27,9 +28,16 @@ export default function StoreCard(props) {
     const orders = JSON.parse(props.StoreInfo.orders.S);
     const [sendCoupon, setSendCoupon] = useState(false);
 
-    console.log(props.contact);
+    //console.log(props.contact);
+
+    function saveCoupon() {
+        return API.post("find-nearby", "/followup", {
+            body: { "Type": "Coupon", "CouponInfo": contact }
+        });
+    }
 
     function handleSendCouponClick() {
+        saveCoupon();
         setSendCoupon(true);
     }
     return (

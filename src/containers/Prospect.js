@@ -12,6 +12,7 @@ import LoaderButton from "../components/LoaderButton";
 import { useAppContext } from "../libs/contextLib";
 import { useFormFields } from "../libs/hooksLib";
 import { onError } from "../libs/errorLib";
+import { API } from "aws-amplify";
 import "./Signup.css";
 
 
@@ -25,6 +26,12 @@ export default function Prospect() {
     const history = useHistory();
     const [sentProspect, setSentProspect] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    function saveProspect() {
+        return API.post("find-nearby", "/followup", {
+            body: { "Type": "Prospect", "ProspectInfo": fields }
+        });
+    }
 
     function validateForm() {
         return (
@@ -41,7 +48,7 @@ export default function Prospect() {
         event.preventDefault();
 
         setIsLoading(true);
-
+        saveProspect();
         setSentProspect(true);
 
         setIsLoading(false);
