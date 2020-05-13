@@ -55,7 +55,7 @@ function App() {
 
         <Navbar expand="sm" bg="primary" className="bg-primary">
           <NavbarBrand className="align-middle" href="/">Home</NavbarBrand>
-          <NavbarToggler onClick={toggle} />
+          <NavbarToggler className='navbar-dark' onClick={toggle} />
           <Collapse className=" " isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar >
               {isAuthenticated ? (
@@ -73,24 +73,24 @@ function App() {
 
 
             </Nav>
-
-          </Collapse>
-          <Nav  >
-            {isAuthenticated ? (
-              <>
-                <NavItem>
-                  <NavLink className="nav-link" to="#" onClick={handleLogout}>Logout</NavLink>
-                </NavItem>
-
-              </>
-            ) : (
+            <Nav  >
+              {isAuthenticated ? (
                 <>
                   <NavItem>
-                    <NavLink className="nav-link" to="/login">Login</NavLink>
+                    <NavLink className="nav-link" to="#" onClick={handleLogout}>Logout</NavLink>
                   </NavItem>
+
                 </>
-              )}
-          </Nav>
+              ) : (
+                  <>
+                    <NavItem>
+                      <NavLink className="nav-link" to="/login">Login</NavLink>
+                    </NavItem>
+                  </>
+                )}
+            </Nav>
+          </Collapse>
+
 
 
         </Navbar>
